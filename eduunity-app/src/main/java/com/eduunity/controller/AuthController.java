@@ -1,6 +1,7 @@
 package com.eduunity.controller;
 
 import com.eduunity.AuthService;
+import com.eduunity.request.StudentAuthRequest;
 import com.eduunity.request.StudentRegisterRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,31 @@ public class AuthController {
         }
 
         return this.authService.registerNewStudent(studentDetails);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> studentAuthenticate(@RequestBody StudentAuthRequest studentAuthRequest) {
+        Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
+
+        String userName = studentAuthRequest.getUserName();
+        String password = studentAuthRequest.getPassword();
+
+        if (userName == null || userName.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "user name is required");
+
+            return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+        }
+
+        if (password == null || password.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "password is required");
+
+            return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+        }
+
+        return this.authService.authenticateStudent(studentAuthRequest);
+
     }
 
     @GetMapping("/test")

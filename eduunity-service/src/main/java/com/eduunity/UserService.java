@@ -1,2 +1,5 @@
-package com.eduunity;public interface UserService {
+package com.eduunity;
+
+public interface UserService {
+
 }

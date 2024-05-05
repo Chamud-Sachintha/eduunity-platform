@@ -3,6 +3,7 @@ package com.eduunity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "862b8b8568af521466d9c448e216fe49fc11e095e5070d0c35a0110ac7760af0";
+    private final String SECRET_KEY = "ed41c2f332859a0f62030c17b0ec20cd4b10dcac798d7a3eb7ed150183a799a5";
 
     public String extractUserEmailFromToken(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
@@ -65,7 +66,7 @@ public class JwtService {
     }
 
     private Key getSigninKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

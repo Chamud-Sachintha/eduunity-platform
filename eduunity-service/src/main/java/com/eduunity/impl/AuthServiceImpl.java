@@ -1,14 +1,19 @@
 package com.eduunity.impl;
 
 import com.eduunity.AuthService;
+import com.eduunity.JwtService;
 import com.eduunity.dto.Student;
 import com.eduunity.enums.Role;
 import com.eduunity.repo.StudentRepository;
+import com.eduunity.request.StudentAuthRequest;
 import com.eduunity.request.StudentRegisterRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,6 +23,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public ResponseEntity<Object> registerNewStudent(StudentRegisterRequest studentRegisterRequest) {
@@ -37,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         studentDetailsEnity.setLastName(studentRegisterRequest.getLastName());
         studentDetailsEnity.setNicNumber(studentRegisterRequest.getNicNumber());
         studentDetailsEnity.setEmail(studentRegisterRequest.getEmail());
-        studentDetailsEnity.setPassword(studentRegisterRequest.getPassword());
+        studentDetailsEnity.setPassword(passwordEncoder.encode(studentRegisterRequest.getPassword()));
         studentDetailsEnity.setRole(Role.STUDENT);
 
         Student newStudent = this.studentRepository.save(studentDetailsEnity);
@@ -47,6 +61,30 @@ public class AuthServiceImpl implements AuthService {
         finalRespObj.put("data", newStudent);
 
         return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> authenticateStudent(StudentAuthRequest studentAuthRequest) {
+
+        Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        studentAuthRequest.getUserName(),
+                        studentAuthRequest.getPassword()
+                )
+        );
+
+         var student = studentRepository.findByEmail(studentAuthRequest.getUserName())
+                 .orElseThrow();
+
+         var jwtToken = jwtService.generateToken(student);
+
+         finalRespObj.put("code", 1);
+         finalRespObj.put("data", student);
+         finalRespObj.put("token", jwtToken);
+         finalRespObj.put("message", "student authenticated successfully");
+
+         return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
     }
 
     private boolean validateStudentNIC(String nicNumber) {
