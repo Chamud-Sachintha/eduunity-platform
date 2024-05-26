@@ -9,5 +9,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
 
     Optional<Student> findByNicNumber(String nicNumber);
 
+    public int countStudentsByStatus(int status);
+
     Optional<Student> findByEmail(String email);
 }

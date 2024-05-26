@@ -58,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
         studentDetailsEnity.setEmail(studentRegisterRequest.getEmail());
         studentDetailsEnity.setPassword(passwordEncoder.encode(studentRegisterRequest.getPassword()));
         studentDetailsEnity.setRole(Role.STUDENT);
+        studentDetailsEnity.setStatus(1);
 
         Student newStudent = this.studentRepository.save(studentDetailsEnity);
 

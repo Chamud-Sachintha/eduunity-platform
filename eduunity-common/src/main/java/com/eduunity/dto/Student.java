@@ -29,6 +29,7 @@ public class Student implements UserDetails {
     private String nicNumber;
     private String email;
     private String password;
+    private int status;
 
     @Enumerated(EnumType.STRING)
     private Role role;
