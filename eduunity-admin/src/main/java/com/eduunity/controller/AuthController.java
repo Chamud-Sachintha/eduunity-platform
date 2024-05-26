@@ -1,15 +1,36 @@
 package com.eduunity.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.eduunity.AuthService;
+import com.eduunity.request.admin.AdminAuthRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("admin/auth")
 public class AuthController {
 
-    @GetMapping("/test")
-    public String sayHellow() {
-        return "this is admin";
+    @Autowired
+    private AuthService authService;
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> authenticateAdmin(@RequestBody AdminAuthRequest adminAuthRequest) {
+        Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
+
+        String username = adminAuthRequest.getUsername();
+        String password = adminAuthRequest.getPassword();
+
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "all fields are required");
+
+            return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+        }
+
+        return this.authService.authenticateAdminUser(adminAuthRequest);
     }
 }

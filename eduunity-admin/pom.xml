@@ -11,6 +11,20 @@
 
     <artifactId>eduunity-admin</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.eduunity</groupId>
+            <artifactId>eduunity-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.eduunity</groupId>
+            <artifactId>eduunity-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

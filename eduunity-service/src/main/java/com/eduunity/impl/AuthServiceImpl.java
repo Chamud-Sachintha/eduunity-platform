@@ -4,9 +4,11 @@ import com.eduunity.AuthService;
 import com.eduunity.JwtService;
 import com.eduunity.dto.Student;
 import com.eduunity.enums.Role;
+import com.eduunity.repo.AdminRepository;
 import com.eduunity.repo.StudentRepository;
 import com.eduunity.request.StudentAuthRequest;
 import com.eduunity.request.StudentRegisterRequest;
+import com.eduunity.request.admin.AdminAuthRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -85,6 +90,29 @@ public class AuthServiceImpl implements AuthService {
          finalRespObj.put("message", "student authenticated successfully");
 
          return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> authenticateAdminUser(AdminAuthRequest adminAuthRequest) {
+        Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        adminAuthRequest.getUsername(),
+                        adminAuthRequest.getPassword()
+                )
+        );
+
+        var adminUser = adminRepository.findByUserName(adminAuthRequest.getUsername())
+                .orElseThrow();
+
+        var jwtToken = jwtService.generateToken(adminUser);
+
+        finalRespObj.put("code", 1);
+        finalRespObj.put("data", adminUser);
+        finalRespObj.put("token", jwtToken);
+        finalRespObj.put("message", "student authenticated successfully");
+
+        return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
     }
 
     private boolean validateStudentNIC(String nicNumber) {
