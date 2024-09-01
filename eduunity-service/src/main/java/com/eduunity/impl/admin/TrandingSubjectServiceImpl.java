@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TrandingSubjectServiceImpl implements TrandingSubjectService {
@@ -52,6 +54,7 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
         return new ResponseEntity<>(finalRespObj, HttpStatus.OK);
     }
 
+    @Override
     public ResponseEntity<Object> getAllTrandingSubjects(int page, int size) {
         HashMap<String, Object> finalRespObj = new HashMap<>();
         HashMap<String, Object> response = new HashMap<>();
@@ -66,5 +69,11 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
         finalRespObj.put("data", response);
 
         return new ResponseEntity<>(finalRespObj, HttpStatus.OK);
+    }
+
+    @Override
+    public List<TrendingSubject> trandingSubjectForAppHome() {
+        List<TrendingSubject> trendingSubjectOptional = this.trandingSubjectRepository.findAll();
+        return trendingSubjectOptional;
     }
 }

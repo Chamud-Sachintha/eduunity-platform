@@ -31,6 +31,7 @@ public class DashboardStatisticsServiceImpl implements DashboardStatisticsServic
         int activeStudentCount = getStudentsCountByStatus(1);
         int inactiveStudentCount = getStudentsCountByStatus(0);
 
+        response.put("allStudentsCount", activeStudentCount + inactiveStudentCount);
         response.put("activeStudentCount", activeStudentCount);
         response.put("inactiveStudentCount", inactiveStudentCount);
 
