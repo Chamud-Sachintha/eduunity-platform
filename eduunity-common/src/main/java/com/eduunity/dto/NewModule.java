@@ -1,6 +1,7 @@
-package com.eduunity;
+package com.eduunity.dto;
 
-import com.eduunity.dto.Student;
+import com.eduunity.util.JsonConverter;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +21,6 @@ public class NewModule {
     private Student student;
     private String moduleName;
     private int experiancedLevel;
-    private boolean isYoutubeBediosWanted;
+    private boolean isYoutubeVideosWanted;
+    private String moduleContent;
 }

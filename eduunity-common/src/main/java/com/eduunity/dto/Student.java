@@ -31,6 +31,9 @@ public class Student implements UserDetails {
     private String password;
     private int status;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NewModule> modules;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

@@ -83,6 +83,8 @@ public class AuthServiceImpl implements AuthService {
          var student = studentRepository.findByEmail(studentAuthRequest.getUserName())
                  .orElseThrow();
 
+         student.setModules(null);
+
          var jwtToken = jwtService.generateToken(student);
 
          finalRespObj.put("code", 1);
