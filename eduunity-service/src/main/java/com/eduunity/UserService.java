@@ -1,8 +1,10 @@
 package com.eduunity;
 
-import org.springframework.http.ResponseEntity;
+import com.eduunity.dto.Student;
+
+import java.util.Optional;
 
 public interface UserService {
 
-    public ResponseEntity<Object> getUserDetails(int uid);
+    public Optional<Student> getUserDetails(int uid);
 }

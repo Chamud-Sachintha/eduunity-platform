@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
+@CrossOrigin
 public class AuthController {
 
     @Autowired
@@ -93,10 +94,5 @@ public class AuthController {
 
         return this.authService.authenticateStudent(studentAuthRequest);
 
-    }
-
-    @GetMapping("/test")
-    public String sayHellow() {
-        return authService.sayHellow();
     }
 }

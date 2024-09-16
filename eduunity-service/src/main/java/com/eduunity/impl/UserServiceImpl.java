@@ -1,10 +1,12 @@
 package com.eduunity.impl;
 
 import com.eduunity.UserService;
+import com.eduunity.dto.Student;
 import com.eduunity.repo.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -14,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<Object> getUserDetails(int uid) {
-        return null;
+    public Optional<Student> getUserDetails(int uid) {
+        return this.studentRepository.findById(uid);
     }
 }

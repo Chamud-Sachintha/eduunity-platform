@@ -40,7 +40,7 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
         saveTrendingSubject.setSubjectName(trendingSubject.getSubjectName());
         saveTrendingSubject.setSubjectDescription(trendingSubject.getSubjectDescription());
 
-        String imageFileString = this.imageService.saveImageToLocalStorage(UPLOAD_PATH, imageFile);
+        String imageFileString = this.imageService.saveImagePinataStorage(imageFile);
 
         saveTrendingSubject.setSubjectImage(imageFileString);
 
@@ -74,6 +74,16 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
     @Override
     public List<TrendingSubject> trandingSubjectForAppHome() {
         List<TrendingSubject> trendingSubjectOptional = this.trandingSubjectRepository.findAll();
+
+        for (TrendingSubject trendingSubject : trendingSubjectOptional) {
+            try {
+                String imageUrl = this.imageService.generatePresignedUrl(trendingSubject.getSubjectImage());
+                trendingSubject.setSubjectImage(imageUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         return trendingSubjectOptional;
     }
 }

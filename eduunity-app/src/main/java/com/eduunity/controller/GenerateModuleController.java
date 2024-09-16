@@ -1,6 +1,7 @@
 package com.eduunity.controller;
 
 import com.eduunity.GenerateModuleService;
+import com.eduunity.request.GenerateModuleContentRequest;
 import com.eduunity.request.GenerateModuleRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,27 @@ public class GenerateModuleController {
             finalRespObj.put("message", "Student id is required");
         } else {
             return this.generateModuleService.getAllGeneratedModulesByStudentId(studentId);
+        }
+
+        return ResponseEntity.ok(finalRespObj);
+    }
+
+    @PostMapping("/get-module-content")
+    public  ResponseEntity<Object> generateModuleContent(@RequestBody GenerateModuleContentRequest moduleContentRequest) {
+
+        Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
+
+        String moduleId = moduleContentRequest.getModuleId();
+        String moduleContentName = moduleContentRequest.getModuleContentName();
+
+        if (moduleId == null || moduleId.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Module ID is required");
+        } else if (moduleContentName == null || moduleContentName.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Module content name is required");
+        } else {
+            return this.generateModuleService.generateModuleContent(Integer.parseInt(moduleId), moduleContentName);
         }
 
         return ResponseEntity.ok(finalRespObj);

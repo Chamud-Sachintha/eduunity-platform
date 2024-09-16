@@ -19,7 +19,7 @@ public class TrendingSubjectController {
     private TrandingSubjectService trandingSubjectService;
 
     @PostMapping("/addTrendingSubject")
-    public ResponseEntity<Object> saveNewTrandingSubject(@ModelAttribute TrendingSubjectRequest trendingSubjectRequest, MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<Object> saveNewTrandingSubject(@ModelAttribute TrendingSubjectRequest trendingSubjectRequest,@RequestParam("file") MultipartFile multipartFile) throws IOException {
 
         HashMap<String, Object> finalRespObj = new HashMap<>();
 
@@ -39,6 +39,6 @@ public class TrendingSubjectController {
 
     @GetMapping("/getAllTrendingSubList")
     public ResponseEntity<Object> getAllTrendingSubjectList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return (this.getAllTrendingSubjectList(page, size));
+        return (this.trandingSubjectService.getAllTrandingSubjects(page, size));
     }
 }
