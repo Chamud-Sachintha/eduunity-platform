@@ -2,7 +2,9 @@ package com.eduunity.impl.admin;
 
 import com.eduunity.admin.DashboardStatisticsService;
 import com.eduunity.dto.Student;
+import com.eduunity.repo.NoticeRepository;
 import com.eduunity.repo.StudentRepository;
+import com.eduunity.repo.TrandingSubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,12 @@ public class DashboardStatisticsServiceImpl implements DashboardStatisticsServic
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private TrandingSubjectRepository trandingSubjectRepository;
+
+    @Autowired
+    private NoticeRepository noticeRepository;
+
     @Override
     public ResponseEntity<Object> getDashboardStatistics() {
 
@@ -32,8 +40,8 @@ public class DashboardStatisticsServiceImpl implements DashboardStatisticsServic
         int inactiveStudentCount = getStudentsCountByStatus(0);
 
         response.put("allStudentsCount", activeStudentCount + inactiveStudentCount);
-        response.put("activeStudentCount", activeStudentCount);
-        response.put("inactiveStudentCount", inactiveStudentCount);
+        response.put("trendingSubjectCount", getTrendingSubjectsCount());
+        response.put("noticeCount", this.noticeRepository.count());
 
         finalRespObj.put("code", 1);
         finalRespObj.put("message", "Operation Success");
@@ -58,6 +66,10 @@ public class DashboardStatisticsServiceImpl implements DashboardStatisticsServic
         finalRespObj.put("data", response);
 
         return new ResponseEntity<Object>(finalRespObj, HttpStatus.OK);
+    }
+
+    private long getTrendingSubjectsCount() {
+        return (this.trandingSubjectRepository.count());
     }
 
     private int getStudentsCountByStatus(int studentStatus) {

@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 @Controller
 @RequestMapping("admin/student")
+@CrossOrigin
 public class StudentController {
 
     @Autowired

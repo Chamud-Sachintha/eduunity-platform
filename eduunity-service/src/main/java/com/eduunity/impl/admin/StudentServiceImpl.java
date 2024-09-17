@@ -30,6 +30,10 @@ public class StudentServiceImpl implements StudentService {
 
         Page<Student> studentList = this.studentRepository.findAll(pageable);
 
+        for (Student student : studentList.getContent()) {
+            student.setModules(null);
+        }
+
         response.put("data", studentList);
         finalRespObj.put("code", 1);
         finalRespObj.put("message", "Operation Success");

@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 @Controller
 @RequestMapping("admin/trending")
+@CrossOrigin
 public class TrendingSubjectController {
 
     @Autowired
@@ -40,5 +41,35 @@ public class TrendingSubjectController {
     @GetMapping("/getAllTrendingSubList")
     public ResponseEntity<Object> getAllTrendingSubjectList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return (this.trandingSubjectService.getAllTrandingSubjects(page, size));
+    }
+
+    @PostMapping("get-subject-by-id")
+    public ResponseEntity<Object> getSubjectById(@RequestParam("id") String subjectId) {
+
+        HashMap<String, Object> finalRespObj = new HashMap<>();
+
+        if (subjectId.isEmpty()) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "All Fields Are Required");
+        } else {
+            return this.trandingSubjectService.getNoticeById(Integer.parseInt(subjectId));
+        }
+
+        return ResponseEntity.ok(finalRespObj);
+    }
+
+    @PostMapping("delete-subject-by-id")
+    public ResponseEntity<Object> deleteSubjectById(@RequestParam("id") String subjectId) {
+
+        HashMap<String, Object> finalRespObj = new HashMap<>();
+
+        if (subjectId.isEmpty() || subjectId == null) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Allfeilds are required");
+        } else {
+            return this.trandingSubjectService.deleteTrandingSubject(Integer.parseInt(subjectId));
+        }
+
+        return ResponseEntity.ok(finalRespObj);
     }
 }

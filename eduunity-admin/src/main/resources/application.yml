@@ -5,6 +5,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/edu_unity_db
     username: postgres
     password: 123
+#    url: jdbc:postgresql://ep-proud-water-a5ni34fk.us-east-2.aws.neon.tech/eduunity_db?sslmode=require
+#    username: eduunity_db_owner
+#    password: HPRcfKkX73uO
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

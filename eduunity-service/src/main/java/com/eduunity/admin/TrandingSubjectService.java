@@ -14,4 +14,8 @@ public interface TrandingSubjectService {
     ResponseEntity<Object> getAllTrandingSubjects(int page, int size);
 
     List<TrendingSubject> trandingSubjectForAppHome();
+
+    ResponseEntity<Object> getNoticeById(int id);
+
+    ResponseEntity<Object> deleteTrandingSubject(int id);
 }

@@ -63,6 +63,15 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
 
         Page<TrendingSubject> allTrendingSubList = this.trandingSubjectRepository.findAll(pageable);
 
+        for (TrendingSubject trendingSubject : allTrendingSubList.getContent()) {
+            try {
+                String imageUrl = this.imageService.generatePresignedUrl(trendingSubject.getSubjectImage());
+                trendingSubject.setSubjectImage(imageUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         response.put("data", allTrendingSubList);
         finalRespObj.put("code", 1);
         finalRespObj.put("message", "Operation Success");
@@ -85,5 +94,38 @@ public class TrandingSubjectServiceImpl implements TrandingSubjectService {
         }
 
         return trendingSubjectOptional;
+    }
+
+    @Override
+    public ResponseEntity<Object> getNoticeById(int id) {
+        HashMap<String, Object> finalRespObj = new HashMap<>();
+
+        TrendingSubject trendingSubject = this.trandingSubjectRepository.findById(id).orElse(null);
+
+        if (trendingSubject != null) {
+            return ResponseEntity.ok(trendingSubject);
+        } else {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Operation Not Found");
+        }
+
+        return ResponseEntity.ok(finalRespObj);
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteTrandingSubject(int id) {
+        HashMap<String, Object> finalRespObj = new HashMap<>();
+
+        try {
+            this.trandingSubjectRepository.deleteById(id);
+
+            finalRespObj.put("code", 1);
+            finalRespObj.put("message", "Operation Success");
+        } catch (Exception e) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Operation Failure");
+        }
+
+        return ResponseEntity.ok(finalRespObj);
     }
 }
