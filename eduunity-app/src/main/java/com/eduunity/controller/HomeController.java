@@ -3,7 +3,9 @@ package com.eduunity.controller;
 import com.eduunity.UserService;
 import com.eduunity.admin.TrandingSubjectService;
 import com.eduunity.dto.Student;
+import com.eduunity.dto.admin.Notice;
 import com.eduunity.dto.admin.TrendingSubject;
+import com.eduunity.impl.admin.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,9 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private NoticeService noticeService;
+
     @GetMapping("/index")
     public ResponseEntity<Object> homeIndex(@RequestParam String userId) {
 
@@ -36,7 +41,9 @@ public class HomeController {
         } else {
             List<TrendingSubject> trendingSubjectList = this.trandingSubjectService.trandingSubjectForAppHome();
             Optional<Student> student = this.userService.getUserDetails(Integer.parseInt(userId));
+            List<Notice> noticeList = this.noticeService.getNoticeListForAppHome();
             response.put("trendingSubjectList", trendingSubjectList);
+            response.put("noticeList", noticeList);
             response.put("student", student);
 
             finalResponse.put("code", 1);

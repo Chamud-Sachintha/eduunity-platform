@@ -11,4 +11,6 @@ public interface GenerateModuleService {
     public ResponseEntity<Object> getAllGeneratedModulesByStudentId(String studentId);
 
     public ResponseEntity<Object> generateModuleContent(int moduleId, String moduleContentName);
+
+    public ResponseEntity<Object> getAllTopicsByModuleId(String moduleId);
 }

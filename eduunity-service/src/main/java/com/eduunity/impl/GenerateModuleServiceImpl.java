@@ -2,9 +2,12 @@ package com.eduunity.impl;
 
 import com.eduunity.GenerateModuleService;
 import com.eduunity.dto.NewModule;
+import com.eduunity.dto.TopicContent;
+import com.eduunity.repo.GenerateTopicContentRepository;
 import com.eduunity.repo.GeneratedModuleRepository;
 import com.eduunity.repo.StudentRepository;
 import com.eduunity.request.GenerateModuleRequest;
+import com.eduunity.request.GenerateTopicContentRequest;
 import com.eduunity.response.Content;
 import com.eduunity.response.ContentRequest;
 import com.eduunity.response.Part;
@@ -31,6 +34,9 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private GenerateTopicContentRepository generateTopicContentRepository;
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -48,6 +54,24 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
         Optional<NewModule> generatedModuleInfo = this.generatedModuleRepository.findById(moduleId);
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBIiqGItoZ3QDlcr0kDoXAGdSneZwGmRQk"; // Replace YOUR_API_KEY with your actual API key
+
+        Optional<TopicContent> getGeneratedTopicContent = this.generateTopicContentRepository.findByModuleIdAndTopicName(moduleId, moduleContentName);
+
+        try {
+            if (getGeneratedTopicContent.isPresent()) {
+                finalRespObj.put("code", 1);
+                finalRespObj.put("message", "Success");
+                finalRespObj.put("data", objectMapper.readTree(getGeneratedTopicContent.get().getContent()));
+                finalRespObj.put("links", objectMapper.readTree(getGeneratedTopicContent.get().getThirdPartyLinks()));
+
+                return ResponseEntity.ok(finalRespObj);
+            }
+        } catch (Exception e) {
+            finalRespObj.put("status", 0);
+            finalRespObj.put("message", "Error Occure" + e.getMessage());
+
+            return ResponseEntity.ok(finalRespObj);
+        }
 
         if (generatedModuleInfo.isPresent()) {
             // Create payload
@@ -67,13 +91,26 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
             // Send the request and get the response
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
             String moduleContent = null;
+            Object thirdPartyLinks = null;
             try {
                 // Parse the response body
                 RootResponse rootResponse = objectMapper.readValue(response.getBody(), RootResponse.class);
 
                 if (rootResponse.getCandidates() != null && !rootResponse.getCandidates().isEmpty()) {
-//                    jsonNode = getJsonNode(rootResponse);
                     moduleContent = rootResponse.getCandidates().get(0).getContent().getParts().get(0).getText();
+
+                    thirdPartyLinks = this.generateRefernceLinksForContent(moduleContentName);
+                    String jsonStringConverted = objectMapper.writeValueAsString(moduleContent);
+                    String jsonStringConverted2 = objectMapper.writeValueAsString(thirdPartyLinks);
+
+                    TopicContent generateTopicContentRequest = new TopicContent();
+
+                    generateTopicContentRequest.setModuleId(moduleId);
+                    generateTopicContentRequest.setTopicName(moduleContentName);
+                    generateTopicContentRequest.setContent(jsonStringConverted);
+                    generateTopicContentRequest.setThirdPartyLinks(jsonStringConverted2);
+
+                    this.generateTopicContentRepository.save(generateTopicContentRequest);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -82,7 +119,7 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
             finalRespObj.put("code", 1);
             finalRespObj.put("message", "Success");
             finalRespObj.put("data", moduleContent);
-            finalRespObj.put("links", this.generateRefernceLinksForContent(moduleContentName));
+            finalRespObj.put("links", thirdPartyLinks);
         } else {
             finalRespObj.put("status", 0);
             finalRespObj.put("message", "Module not found");
@@ -185,6 +222,57 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
         return ResponseEntity.ok(finalRespObj);
     }
 
+    @Override
+    public ResponseEntity<Object> getAllTopicsByModuleId(String moduleId) {
+
+        HashMap<String, Object> finalRespObj = new LinkedHashMap<>();
+        HashMap<String, Object> formatedTopicList = new HashMap<>();
+
+        int moduleIdInt;
+        try {
+            moduleIdInt = Integer.parseInt(moduleId);
+        } catch (NumberFormatException e) {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Invalid module ID");
+            return ResponseEntity.badRequest().body(finalRespObj);
+        }
+
+        Optional<NewModule> getModuleInfo = this.generatedModuleRepository.findById(moduleIdInt);
+
+        if (getModuleInfo.isPresent()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode getModuleContent = null;
+
+            try {
+                getModuleContent = objectMapper.readTree(getModuleInfo.get().getModuleContent());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String experiancedLevelText = null;
+
+            if (getModuleInfo.get().getExperiancedLevel() == 1) {
+                experiancedLevelText = "Beginner Level";
+            } else if (getModuleInfo.get().getExperiancedLevel() == 2) {
+                experiancedLevelText = "Intermidiate Level";
+            } else if (getModuleInfo.get().getExperiancedLevel() == 3) {
+                experiancedLevelText = "End Level";
+            }
+
+            formatedTopicList.put("moduleContent", getModuleContent);
+            formatedTopicList.put("experiancedLevel", experiancedLevelText);
+
+            finalRespObj.put("code", 1);
+            finalRespObj.put("message", "sucess");
+            finalRespObj.put("content", formatedTopicList);
+        } else {
+            finalRespObj.put("code", 0);
+            finalRespObj.put("message", "Module not found");
+        }
+
+        return ResponseEntity.ok(finalRespObj);
+    }
+
     private Object generateRefernceLinksForContent(String topic) {
         String url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCmKsHUxa1cP2pi3mZPfa5ox1uK5Z3Qw0c&cx=f2945890e1d9e4d71&q=" + topic;
 
@@ -226,7 +314,7 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
             experiancedLevelText = "advanced";
         }
 
-        return text + " " + experiancedLevelText + " give me modules and like json format rename module name as title";
+        return text + " " + experiancedLevelText + " give me 10 modules and like json format rename module name as title ino need any other content i need all the titles are inside modules remember this i want each module inside title block";
     }
 
     private String generateModuleContentSentence(String moduleName, int expLevel) {

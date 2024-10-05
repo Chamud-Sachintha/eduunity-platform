@@ -17,6 +17,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<Student> getUserDetails(int uid) {
-        return this.studentRepository.findById(uid);
+        Optional<Student> studentInfo = this.studentRepository.findById(uid);
+        studentInfo.get().setModules(null);
+
+        return studentInfo;
     }
 }

@@ -109,4 +109,11 @@ public class NoticeService {
 
         return ResponseEntity.ok(response);
     }
+
+    public List<Notice> getNoticeListForAppHome() {
+        List<Notice> noticeList = new ArrayList<>();
+
+        noticeList = this.noticeRepository.findAll();
+        return noticeList;
+    }
 }
