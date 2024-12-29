@@ -1,6 +1,7 @@
 package com.eduunity.controller;
 
 import com.eduunity.GenerateModuleService;
+import com.eduunity.dto.NewModule;
 import com.eduunity.request.GenerateModuleContentRequest;
 import com.eduunity.request.GenerateModuleRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/generate")
@@ -92,7 +94,7 @@ public class GenerateModuleController {
         return ResponseEntity.ok(finalRespObj);
     }
 
-    @PostMapping("level-up-module")
+    @PostMapping("/level-up-module")
     public ResponseEntity<Object> levelUpModule(@RequestBody GenerateModuleRequest generateModuleRequest) {
 
         Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
@@ -105,14 +107,16 @@ public class GenerateModuleController {
             finalRespObj.put("message", "first name is required");
         } else if (moduleName == null || moduleName.isEmpty()) {
             finalRespObj.put("code", 0);
-            finalRespObj.put("message", "first name is required");
+            finalRespObj.put("message", "Module id is required");
         } else {
-            generateModuleRequest.setExperiancedLevel(generateModuleRequest.getExperiancedLevel() + 1);
+            Optional<NewModule> moduleInfo = this.generateModuleService.getModuleInfoByModuleId(Integer.parseInt(moduleName));
 
-            if (generateModuleRequest.getExperiancedLevel() > 3) {
+            if (moduleInfo == null) {
                 finalRespObj.put("code", 0);
-                finalRespObj.put("message", "Invalid Experiance level");
+                finalRespObj.put("message", "Invalid Module Id level");
             } else {
+                generateModuleRequest.setExperiancedLevel(moduleInfo.get().getExperiancedLevel() + 1);
+                generateModuleRequest.setModuleName(moduleInfo.get().getModuleName());
                 return this.generateModuleService.generateNewModule(generateModuleRequest);
             }
         }

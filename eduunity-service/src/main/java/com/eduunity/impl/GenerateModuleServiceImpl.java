@@ -53,7 +53,7 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
 
         Optional<NewModule> generatedModuleInfo = this.generatedModuleRepository.findById(moduleId);
 
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBIiqGItoZ3QDlcr0kDoXAGdSneZwGmRQk"; // Replace YOUR_API_KEY with your actual API key
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyB5eaSHI8uHBLzYzWncuHwsB9hCbPooL6Y"; // Replace YOUR_API_KEY with your actual API key
 
         Optional<TopicContent> getGeneratedTopicContent = this.generateTopicContentRepository.findByModuleIdAndTopicName(moduleId, moduleContentName);
 
@@ -169,7 +169,7 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
         Map<String, Object> finalRespObj = new LinkedHashMap<String, Object>();
         NewModule newModule = new NewModule();
 
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBIiqGItoZ3QDlcr0kDoXAGdSneZwGmRQk"; // Replace YOUR_API_KEY with your actual API key
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyB5eaSHI8uHBLzYzWncuHwsB9hCbPooL6Y"; // Replace YOUR_API_KEY with your actual API key
 
         // Create payload
         String formatedPayloadTextContent = configPartName(generateModuleRequest.getExperiancedLevel(), generateModuleRequest.getModuleName());
@@ -271,6 +271,17 @@ public class GenerateModuleServiceImpl implements GenerateModuleService {
         }
 
         return ResponseEntity.ok(finalRespObj);
+    }
+
+    public Optional<NewModule> getModuleInfoByModuleId(int moduleId) {
+
+        Optional<NewModule> moduleInfo = this.generatedModuleRepository.findById(moduleId);
+
+        if (moduleInfo.isPresent()) {
+            return moduleInfo;
+        } else {
+            return null;
+        }
     }
 
     private Object generateRefernceLinksForContent(String topic) {
